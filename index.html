@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SRMS — Marthandam College</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --bg:#080a0f;--surface:#0f1219;--card:#14192a;--card2:#181e30;
+  --border:#1d2540;--border2:#252d45;
+  --gold:#e8b86d;--gold2:#d4a043;--gold3:#f5d48e;
+  --purple:#a78bfa;--green:#34d399;--red:#f87171;--blue:#60a5fa;
+  --text:#eef0f8;--text2:#b8bdd6;--muted:#5a6280;
+  --fh:'Playfair Display',serif;--fb:'Outfit',sans-serif;
+  --r:14px;--r2:20px;--sh:0 24px 64px rgba(0,0,0,.7);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 10% 10%,rgba(232,184,109,.05),transparent 60%),radial-gradient(ellipse 50% 50% at 90% 90%,rgba(167,139,250,.04),transparent 60%);pointer-events:none;z-index:0;}
+
+/* LOGIN */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;position:relative;z-index:1;padding:20px;}
+.lcard{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border2);border-radius:28px;padding:48px 44px;width:440px;max-width:100%;box-shadow:var(--sh);animation:rise .7s cubic-bezier(.22,1,.36,1) both;position:relative;overflow:hidden;}
+.lcard::before{content:'';position:absolute;top:-80px;right:-80px;width:200px;height:200px;background:radial-gradient(circle,rgba(232,184,109,.1),transparent 70%);border-radius:50%;}
+.llogo{font-family:var(--fh);font-size:2.2rem;background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;position:relative;z-index:1;}
+.lcollege{color:var(--muted);font-size:.8rem;margin-bottom:26px;position:relative;z-index:1;}
+.lcopy{font-size:.72rem;color:var(--muted);}
+.lcopy span{color:var(--gold);}
+
+.role-sw{display:flex;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:12px;padding:4px;margin-bottom:22px;position:relative;z-index:1;}
+.role-btn{flex:1;padding:9px;text-align:center;border-radius:9px;cursor:pointer;font-size:.85rem;color:var(--muted);transition:all .2s;font-weight:500;}
+.role-btn.active{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#0a0805;font-weight:700;}
+
+.iw{margin-bottom:18px;position:relative;z-index:1;}
+.iw label{display:block;font-size:.7rem;color:var(--gold);margin-bottom:7px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;}
+.iw input,.iw select{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:12px;color:var(--text);font-family:var(--fb);font-size:.92rem;padding:13px 16px;outline:none;transition:all .25s;}
+.iw input:focus,.iw select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,184,109,.08);}
+#lerr{color:var(--red);font-size:.82rem;margin-top:10px;text-align:center;min-height:18px;position:relative;z-index:1;}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border-radius:12px;border:none;font-family:var(--fb);font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-gold{background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));color:#0a0805;}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(232,184,109,.32);}
+.btn-green{background:linear-gradient(135deg,#6ee7b7,var(--green),#059669);color:#022c22;}
+.btn-green:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(52,211,153,.28);}
+.btn-red{background:rgba(248,113,113,.08);color:var(--red);border:1px solid rgba(248,113,113,.2);}
+.btn-red:hover{background:var(--red);color:#fff;border-color:var(--red);}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn-blue{background:linear-gradient(135deg,#93c5fd,var(--blue),#2563eb);color:#0a0f1e;}
+.btn-blue:hover{transform:translateY(-1px);}
+.btn-purple{background:linear-gradient(135deg,#c4b5fd,var(--purple),#7c3aed);color:#f5f3ff;}
+.btn-purple:hover{transform:translateY(-1px);}
+.btn-full{width:100%;}
+.btn-sm{padding:6px 13px;font-size:.77rem;border-radius:9px;}
+
+/* APP */
+#app{display:none;min-height:100vh;flex-direction:column;position:relative;z-index:1;}
+.topbar{background:rgba(8,10,15,.93);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.tb-brand{font-family:var(--fh);font-size:1.3rem;background:linear-gradient(135deg,var(--gold3),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.tb-copy{font-size:.67rem;color:var(--muted);margin-left:10px;}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.upill{background:rgba(232,184,109,.07);border:1px solid rgba(232,184,109,.18);border-radius:20px;padding:6px 14px;font-size:.76rem;color:var(--gold);}
+.rpill{font-size:.67rem;padding:3px 9px;border-radius:20px;font-weight:700;}
+.rpill.admin{background:rgba(167,139,250,.12);color:var(--purple);border:1px solid rgba(167,139,250,.2);}
+.rpill.student{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:5px;animation:pulse 2s infinite;}
+.dot.off{background:var(--red);animation:none;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+.shell{display:flex;flex:1;}
+.sidebar{width:228px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;flex-shrink:0;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;display:flex;flex-direction:column;}
+.nsec{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;padding:0 20px;margin:16px 0 6px;}
+.nitem{display:flex;align-items:center;gap:12px;padding:11px 20px;font-size:.86rem;color:var(--muted);cursor:pointer;transition:all .18s;border-left:3px solid transparent;}
+.nitem:hover{color:var(--text2);background:rgba(232,184,109,.04);}
+.nitem.active{color:var(--gold);background:rgba(232,184,109,.07);border-left-color:var(--gold);}
+.nicon{font-size:1rem;width:20px;text-align:center;}
+.sfoot{margin-top:auto;padding:14px 20px;border-top:1px solid var(--border);}
+.scopy{font-size:.65rem;color:var(--muted);line-height:1.7;}
+.scopy strong{color:var(--gold);}
+
+.inner{flex:1;display:flex;flex-direction:column;min-width:0;}
+.content{flex:1;padding:28px 32px;overflow-y:auto;}
+.page{display:none;animation:rise .3s cubic-bezier(.22,1,.36,1) both;}
+.page.active{display:block;}
+.phd{margin-bottom:22px;}
+.ptitle{font-family:var(--fh);font-size:1.9rem;margin-bottom:4px;}
+.psub{color:var(--muted);font-size:.83rem;}
+
+/* STATS */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px;margin-bottom:22px;}
+.sbox{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border2);border-radius:var(--r);padding:20px;position:relative;overflow:hidden;transition:transform .2s;}
+.sbox:hover{transform:translateY(-2px);}
+.sbox::after{content:'';position:absolute;top:-22px;right:-22px;width:86px;height:86px;border-radius:50%;opacity:.08;}
+.sbox.g::after{background:var(--gold);}
+.sbox.p::after{background:var(--purple);}
+.sbox.gr::after{background:var(--green);}
+.sbox.b::after{background:var(--blue);}
+.sico{font-size:1.6rem;margin-bottom:12px;}
+.snum{font-family:var(--fh);font-size:2rem;line-height:1;margin-bottom:3px;}
+.slbl{color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;}
+.shint{font-size:.73rem;color:var(--gold);margin-top:5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* CHARTS */
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px;}
+.cbox{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border2);border-radius:var(--r);padding:22px;}
+.clbl{font-size:.84rem;font-weight:600;color:var(--text2);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.bars{display:flex;flex-direction:column;gap:13px;}
+.br{display:flex;align-items:center;gap:10px;}
+.bn{font-size:.72rem;color:var(--muted);width:100px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bt{flex:1;background:rgba(255,255,255,.05);border-radius:6px;height:9px;overflow:hidden;}
+.bf{height:9px;border-radius:6px;background:linear-gradient(90deg,var(--gold3),var(--gold));transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.bv{font-size:.73rem;color:var(--gold);font-weight:700;width:30px;text-align:right;}
+.tt{width:100%;border-collapse:collapse;}
+.tt th{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:7px 10px;border-bottom:1px solid var(--border);text-align:left;}
+.tt td{font-size:.81rem;padding:9px 10px;border-bottom:1px solid rgba(29,37,64,.4);}
+.tt tr:last-child td{border-bottom:none;}
+
+/* TABLE */
+.tc{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;margin-bottom:18px;}
+table{width:100%;border-collapse:collapse;}
+th{padding:10px 15px;text-align:left;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:12px 15px;font-size:.84rem;border-bottom:1px solid rgba(29,37,64,.4);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(232,184,109,.02);}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:.7rem;font-weight:700;}
+.gO{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2);}
+.gAp{background:rgba(232,184,109,.1);color:var(--gold);border:1px solid rgba(232,184,109,.2);}
+.gA{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.2);}
+.gBp{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.2);}
+.gB{background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.2);}
+.gC{background:rgba(251,146,60,.1);color:#fb923c;border:1px solid rgba(251,146,60,.2);}
+.gF{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2);}
+.bdept{background:rgba(167,139,250,.08);color:var(--purple);border:1px solid rgba(167,139,250,.15);}
+.byear{background:rgba(96,165,250,.08);color:var(--blue);border:1px solid rgba(96,165,250,.15);}
+
+/* SEARCH */
+.sbar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+.sbar input,.sbar select{background:var(--card);border:1px solid var(--border2);border-radius:12px;color:var(--text);font-family:var(--fb);font-size:.87rem;padding:10px 14px;outline:none;transition:all .2s;}
+.sbar input{flex:1;min-width:160px;}
+.sbar input:focus{border-color:var(--gold);}
+
+/* MODAL */
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(10px);padding:16px;}
+.mbg.open{display:flex;}
+.modal{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border2);border-radius:var(--r2);padding:32px;width:540px;max-width:100%;box-shadow:var(--sh);animation:rise .25s cubic-bezier(.22,1,.36,1) both;max-height:90vh;overflow-y:auto;}
+.modal h2{font-family:var(--fh);font-size:1.4rem;margin-bottom:22px;color:var(--gold);}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.frow.one{grid-template-columns:1fr;}
+.mfoot{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;flex-wrap:wrap;}
+
+/* RESULT */
+.rhd{background:linear-gradient(135deg,rgba(232,184,109,.07),rgba(167,139,250,.04));border:1px solid var(--border2);border-radius:var(--r);padding:22px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;}
+.rhd h2{font-family:var(--fh);font-size:1.5rem;}
+.rhd p{color:var(--muted);font-size:.82rem;margin-top:3px;}
+.grow{display:flex;gap:10px;flex-wrap:wrap;}
+.gpill{background:rgba(232,184,109,.07);border:1px solid rgba(232,184,109,.18);border-radius:40px;padding:9px 18px;text-align:center;min-width:80px;}
+.gnum{font-family:var(--fh);font-size:1.7rem;color:var(--gold);line-height:1;}
+.glbl{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+.ssec{margin-bottom:22px;}
+.shead{font-size:.72rem;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.stag{background:rgba(232,184,109,.1);border-radius:20px;padding:2px 10px;font-size:.68rem;}
+.ebar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+
+/* AUTO FILL */
+.af-hint{border-radius:10px;padding:10px 14px;font-size:.81rem;margin-bottom:14px;display:none;}
+.af-hint.found{background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.2);color:var(--green);}
+.af-hint.notfound{background:rgba(232,184,109,.06);border:1px solid rgba(232,184,109,.2);color:var(--gold);}
+
+/* RANK */
+.ri{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border2);border-radius:var(--r);padding:18px 22px;display:flex;align-items:center;gap:16px;margin-bottom:10px;transition:all .2s;cursor:pointer;}
+.ri:hover{border-color:rgba(232,184,109,.3);transform:translateX(5px);}
+.rno{font-family:var(--fh);font-size:1.6rem;color:var(--muted);width:42px;text-align:center;flex-shrink:0;}
+.rinfo{flex:1;min-width:0;}
+.rname{font-size:.94rem;font-weight:600;margin-bottom:2px;}
+.rsub{font-size:.75rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rcgpa{font-family:var(--fh);font-size:1.6rem;color:var(--gold);flex-shrink:0;}
+
+/* PASSWORD */
+.pwcard{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border2);border-radius:var(--r);padding:26px;max-width:420px;}
+
+/* MARKSHEET */
+#msc{position:fixed;left:-9999px;top:0;z-index:-1;background:#fff;}
+.msp{background:#fff;color:#1a1a2e;padding:32px;font-family:'Outfit',sans-serif;width:820px;}
+.mshd{text-align:center;border-bottom:3px solid #1a1a2e;padding-bottom:16px;margin-bottom:18px;}
+.mscol{font-size:1.1rem;font-weight:800;color:#1a1a2e;}
+.msaff{font-size:.78rem;color:#555;margin-top:2px;}
+.mstit{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:900;margin:10px 0 3px;color:#1a1a2e;}
+.msdt{font-size:.7rem;color:#777;}
+.msinf{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:16px;font-size:.84rem;padding:12px;background:#f8f8f8;border-radius:8px;}
+.msinf div{display:flex;gap:6px;}
+.msinf .ml{color:#666;min-width:128px;}
+.msinf .mv{font-weight:700;color:#1a1a2e;}
+.mst{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:.83rem;}
+.mst th{background:#1a1a2e;color:#fff;padding:8px 11px;text-align:left;font-size:.72rem;text-transform:uppercase;}
+.mst td{padding:8px 11px;border-bottom:1px solid #eee;}
+.mst tr:nth-child(even) td{background:#fafafa;}
+.mst .smr td{background:#1a1a2e!important;color:#fff!important;font-weight:700;border:none;}
+.mssemhd{font-weight:800;font-size:.87rem;color:#1a1a2e;padding:7px 0 5px;border-bottom:2px solid #1a1a2e;margin-bottom:7px;}
+.msft{text-align:center;font-size:.7rem;color:#999;border-top:1px solid #ddd;padding-top:10px;margin-top:14px;}
+.msdev{text-align:right;font-size:.65rem;color:#bbb;margin-top:5px;}
+
+/* FOOTER */
+.afoot{background:var(--surface);border-top:1px solid var(--border);padding:12px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+.ftxt{font-size:.69rem;color:var(--muted);}
+.ftxt span{color:var(--gold);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card2);border:1px solid var(--border2);border-radius:13px;padding:13px 18px;font-size:.86rem;z-index:9999;box-shadow:var(--sh);transform:translateY(70px);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:9px;max-width:300px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{border-left:4px solid var(--green);}
+.toast.err{border-left:4px solid var(--red);}
+.toast.info{border-left:4px solid var(--gold);}
+
+.empty{text-align:center;padding:48px;color:var(--muted);}
+.eico{font-size:2.8rem;margin-bottom:10px;}
+code{background:rgba(255,255,255,.06);padding:2px 7px;border-radius:5px;font-size:.8rem;font-family:monospace;}
+@keyframes rise{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
+
+/* MOBILE */
+@media(max-width:768px){
+  .sidebar{display:none;}.mobnav{display:flex!important;}
+  .content{padding:14px;}.frow{grid-template-columns:1fr;}
+  .rhd{flex-direction:column;}.grow{justify-content:center;}
+  table{font-size:.76rem;}th,td{padding:8px 9px;}
+  .topbar{padding:0 14px;}.tb-copy{display:none;}
+  .ptitle{font-size:1.5rem;}.sgrid{grid-template-columns:1fr 1fr;}
+  .cgrid{grid-template-columns:1fr;}.afoot{justify-content:center;text-align:center;}
+}
+.mobnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:200;padding:6px 0 10px;}
+.mni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;color:var(--muted);cursor:pointer;font-size:.6rem;transition:color .2s;}
+.mni.active{color:var(--gold);}
+.mni .nicon{font-size:1.25rem;}
+.mnitems{display:flex;justify-content:space-around;}
+@media(max-width:768px){body{padding-bottom:76px;}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="lcard">
+    <div class="llogo">📚 SRMS</div>
+    <div class="lcollege">Marthandam College of Engineering &amp; Technology</div>
+    <div class="role-sw">
+      <div class="role-btn active" id="rb-admin" onclick="setRole('admin')">🔑 Admin</div>
+      <div class="role-btn" id="rb-student" onclick="setRole('student')">👨‍🎓 Student</div>
+    </div>
+    <div id="af">
+      <div class="iw"><label>Username</label><input type="text" id="lu" placeholder="Admin username" autocomplete="username"/></div>
+      <div class="iw"><label>Password</label><input type="password" id="lp" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    </div>
+    <div id="sf" style="display:none;">
+      <div class="iw"><label>Register Number</label><input type="text" id="lr" placeholder="e.g. 22114101" autocomplete="username"/></div>
+      <div class="iw"><label>Password <span style="color:var(--muted);font-size:.7em">(default: your register number)</span></label>
+        <input type="password" id="lsp" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    </div>
+    <button class="btn btn-gold btn-full" onclick="doLogin()" style="margin-top:4px;">Sign In →</button>
+    <div id="lerr"></div>
+  </div>
+  <div class="lcopy">© 2026 <span>Osborn Matthew A I</span> · All Rights Reserved</div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="tb-brand">📚 SRMS</div>
+      <span class="tb-copy">© Osborn Matthew A I</span>
+      <span style="font-size:.7rem;color:var(--muted);display:flex;align-items:center;">
+        <span class="dot" id="sdot"></span><span id="stxt">…</span>
+      </span>
+    </div>
+    <div class="tb-right">
+      <span class="rpill" id="rpill">Admin</span>
+      <span class="upill" id="upill">👤 —</span>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+  <div class="shell">
+    <nav class="sidebar" id="sidebar"></nav>
+    <div class="inner">
+      <div class="content">
+
+        <!-- DASHBOARD -->
+        <div class="page" id="page-dashboard">
+          <div class="phd"><div class="ptitle">Dashboard</div><div class="psub">Academic overview — MCET</div></div>
+          <div class="sgrid" id="sgrid"></div>
+          <div class="cgrid">
+            <div class="cbox"><div class="clbl">📊 Dept-wise Avg CGPA</div><div class="bars" id="cdept"></div></div>
+            <div class="cbox"><div class="clbl">🥇 Department Toppers</div><table class="tt" id="ctop"></table></div>
+          </div>
+        </div>
+
+        <!-- STUDENTS -->
+        <div class="page" id="page-students">
+          <div class="phd"><div class="ptitle">Students</div><div class="psub">Manage enrolled students</div></div>
+          <div class="sbar">
+            <input type="text" id="sinp" placeholder="🔍 Search by name or register number…" oninput="searchStudents()"/>
+            <button class="btn btn-green" onclick="openAdd()">+ Add Student</button>
+          </div>
+          <div class="tc">
+            <table>
+              <thead><tr><th>#</th><th>Name</th><th>Register No</th><th>Department</th><th>Year</th><th>Email</th><th>Actions</th></tr></thead>
+              <tbody id="sbody"><tr><td colspan="7"><div class="empty"><div class="eico">⏳</div>Loading…</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW RESULTS -->
+        <div class="page" id="page-results">
+          <div class="phd"><div class="ptitle">View Results</div><div class="psub" id="rsub">Search a student to view and export marksheet</div></div>
+          <div id="adm-search">
+            <div class="sbar"><input type="text" id="rsinp" placeholder="🔍 Search student…" oninput="searchForResult()"/></div>
+            <div id="rslist" class="tc" style="margin-bottom:16px;display:none;">
+              <table><thead><tr><th>Name</th><th>Register No</th><th>Department</th><th>Year</th><th></th></tr></thead>
+              <tbody id="rsbody"></tbody></table>
+            </div>
+          </div>
+          <div id="rview"></div>
+        </div>
+
+        <!-- ADD RESULT -->
+        <div class="page" id="page-add-result">
+          <div class="phd"><div class="ptitle">Add Result</div><div class="psub">Enter subject result</div></div>
+          <div style="max-width:580px;">
+            <div class="tc" style="padding:26px;">
+              <div id="adm-stu-search">
+                <div class="iw"><label>Search Student</label>
+                  <input type="text" id="arsch" placeholder="Type name or register number…" oninput="arSearch()"/></div>
+                <div id="arlist" style="margin-bottom:14px;display:none;">
+                  <select id="arsel" style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;color:var(--text);font-family:var(--fb);font-size:.87rem;padding:10px 13px;outline:none;" onchange="selAR()" size="4"></select>
+                </div>
+              </div>
+              <div id="arsel-info" style="display:none;background:rgba(232,184,109,.05);border:1px solid rgba(232,184,109,.18);border-radius:11px;padding:11px 14px;margin-bottom:14px;font-size:.87rem;color:var(--gold);"></div>
+              <div class="frow">
+                <div class="iw"><label>Subject Code</label><input type="text" id="arcode" placeholder="e.g. IT3401" oninput="autoFill()"/></div>
+                <div class="iw"><label>Subject Name</label><input type="text" id="arname" placeholder="e.g. Web Essentials"/></div>
+              </div>
+              <div id="afhint" class="af-hint"></div>
+              <div class="frow">
+                <div class="iw">
+                  <label>Grade</label>
+                  <select id="argrade">
+                    <option value="O">O — Outstanding (10)</option>
+                    <option value="A+">A+ (9)</option><option value="A">A (8)</option>
+                    <option value="B+">B+ (7)</option><option value="B">B (6)</option>
+                    <option value="C">C (5)</option><option value="F">F — Fail (0)</option>
+                  </select>
+                </div>
+                <div class="iw"><label>Credits</label><input type="number" id="arcred" placeholder="3" min="0.5" max="10" step="0.5"/></div>
+              </div>
+              <div class="iw"><label>Semester (1–8)</label><input type="number" id="arsem" placeholder="e.g. 3" min="1" max="8"/></div>
+              <button class="btn btn-green btn-full" onclick="submitResult()" style="margin-top:8px;">💾 Save Result</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RANK LIST -->
+        <div class="page" id="page-ranklist">
+          <div class="phd"><div class="ptitle">Rank List</div><div class="psub">Ranked by CGPA — Anna University</div></div>
+          <div class="sbar">
+            <select id="rdept" onchange="loadRankList()">
+              <option value="all">All Departments</option>
+              <option>Information Technology</option><option>Computer Science</option>
+              <option>Electronics</option><option>Mechanical Engineering</option>
+              <option>Civil Engineering</option><option>Electrical Engineering</option>
+            </select>
+            <button class="btn btn-purple" onclick="exportAllPDF()">📄 Export All PDF</button>
+          </div>
+          <div id="rcon"></div>
+        </div>
+
+        <!-- CHANGE PASSWORD -->
+        <div class="page" id="page-password">
+          <div class="phd"><div class="ptitle">Change Password</div><div class="psub">Update your login password</div></div>
+          <div class="pwcard">
+            <div class="iw"><label>Current Password</label><input type="password" id="cpold" placeholder="Current password"/></div>
+            <div class="iw"><label>New Password</label><input type="password" id="cpnew" placeholder="New password (min 4 chars)"/></div>
+            <div class="iw"><label>Confirm New Password</label><input type="password" id="cpconf" placeholder="Confirm new password"/></div>
+            <button class="btn btn-gold btn-full" onclick="changePW()">Update Password</button>
+          </div>
+        </div>
+
+      </div>
+      <div class="afoot">
+        <div class="ftxt">© 2026 <span>Osborn Matthew A I</span> · Student Result Management System</div>
+        <div class="ftxt">Marthandam College of Engineering &amp; Technology · Anna University</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mobnav" id="mobnav"></div>
+
+<!-- STUDENT MODAL -->
+<div class="mbg" id="smodal">
+  <div class="modal">
+    <h2 id="mtitle">Add Student</h2>
+    <input type="hidden" id="mid"/>
+    <div class="frow">
+      <div class="iw"><label>Full Name</label><input type="text" id="mname" placeholder="Arjun Kumar"/></div>
+      <div class="iw"><label>Register Number</label><input type="text" id="mreg" placeholder="22114101"/></div>
+    </div>
+    <div class="frow">
+      <div class="iw"><label>Department</label>
+        <select id="mdept">
+          <option>Information Technology</option><option>Computer Science</option>
+          <option>Electronics</option><option>Mechanical Engineering</option>
+          <option>Civil Engineering</option><option>Electrical Engineering</option>
+        </select>
+      </div>
+      <div class="iw"><label>Year</label>
+        <select id="myear">
+          <option value="1">1st Year</option><option value="2">2nd Year</option>
+          <option value="3">3rd Year</option><option value="4">4th Year</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow one"><div class="iw"><label>Email</label><input type="email" id="memail" placeholder="student@example.com"/></div></div>
+    <div style="background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.15);border-radius:10px;padding:10px 14px;font-size:.79rem;color:var(--green);margin-top:4px;">
+      ℹ️ Default password = Register Number. Student can change after login.
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-ghost" onclick="closeMod('smodal')">Cancel</button>
+      <button class="btn btn-green" onclick="saveStu()">Save Student</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="msc"></div>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────────────
+const API = 'https://your-app-name.onrender.com'; // ← CHANGE THIS TO YOUR RENDER URL
+
+// ── SUBJECT DATABASE (from B.Tech IT Anna University 2021 PDF) ─
+const SUBDB = {
+  // SEMESTER 1
+  'HS3152':{name:'Professional English - I',credits:3,semester:1},
+  'MA3151':{name:'Matrices and Calculus',credits:4,semester:1},
+  'PH3151':{name:'Engineering Physics',credits:3,semester:1},
+  'CY3151':{name:'Engineering Chemistry',credits:3,semester:1},
+  'GE3151':{name:'Problem Solving and Python Programming',credits:3,semester:1},
+  'GE3152':{name:'Heritage of Tamils',credits:1,semester:1},
+  'GE3171':{name:'Problem Solving and Python Programming Laboratory',credits:2,semester:1},
+  'BS3171':{name:'Physics and Chemistry Laboratory',credits:2,semester:1},
+  'GE3172':{name:'English Laboratory',credits:1,semester:1},
+  // SEMESTER 2
+  'HS3252':{name:'Professional English - II',credits:2,semester:2},
+  'MA3251':{name:'Statistics and Numerical Methods',credits:4,semester:2},
+  'PH3256':{name:'Physics for Information Science',credits:3,semester:2},
+  'BE3251':{name:'Basic Electrical and Electronics Engineering',credits:3,semester:2},
+  'GE3251':{name:'Engineering Graphics',credits:4,semester:2},
+  'CS3251':{name:'Programming in C',credits:3,semester:2},
+  'GE3252':{name:'Tamils and Technology',credits:1,semester:2},
+  'GE3271':{name:'Engineering Practices Laboratory',credits:2,semester:2},
+  'CS3271':{name:'Programming in C Laboratory',credits:2,semester:2},
+  'GE3272':{name:'Communication Laboratory',credits:2,semester:2},
+  // SEMESTER 3
+  'MA3354':{name:'Discrete Mathematics',credits:4,semester:3},
+  'CS3351':{name:'Digital Principles and Computer Organization',credits:4,semester:3},
+  'CS3352':{name:'Foundations of Data Science',credits:3,semester:3},
+  'CD3291':{name:'Data Structures and Algorithms',credits:3,semester:3},
+  'CS3391':{name:'Object Oriented Programming',credits:3,semester:3},
+  'CD3281':{name:'Data Structures and Algorithms Laboratory',credits:2,semester:3},
+  'CS3381':{name:'Object Oriented Programming Laboratory',credits:1.5,semester:3},
+  'CS3361':{name:'Data Science Laboratory',credits:2,semester:3},
+  'GE3361':{name:'Professional Development',credits:1,semester:3},
+  // SEMESTER 4
+  'CS3452':{name:'Theory of Computation',credits:3,semester:4},
+  'CS3491':{name:'Artificial Intelligence and Machine Learning',credits:4,semester:4},
+  'CS3492':{name:'Database Management Systems',credits:3,semester:4},
+  'IT3401':{name:'Web Essentials',credits:4,semester:4},
+  'CS3451':{name:'Introduction to Operating Systems',credits:3,semester:4},
+  'GE3451':{name:'Environmental Sciences and Sustainability',credits:2,semester:4},
+  'CS3461':{name:'Operating Systems Laboratory',credits:1.5,semester:4},
+  'CS3481':{name:'Database Management Systems Laboratory',credits:1.5,semester:4},
+  // SEMESTER 5
+  'CS3591':{name:'Computer Networks',credits:4,semester:5},
+  'IT3501':{name:'Full Stack Web Development',credits:3,semester:5},
+  'CS3551':{name:'Distributed Computing',credits:3,semester:5},
+  'CS3691':{name:'Embedded Systems and IoT',credits:4,semester:5},
+  'IT3511':{name:'Full Stack Web Development Laboratory',credits:2,semester:5},
+  // SEMESTER 6
+  'CCS356':{name:'Object Oriented Software Engineering',credits:4,semester:6},
+  'IT3601':{name:'Artificial Intelligence Techniques',credits:3,semester:6},
+  'IT3681':{name:'Mobile Applications Development Laboratory',credits:1.5,semester:6},
+  // SEMESTER 7
+  'GE3791':{name:'Human Values and Ethics',credits:2,semester:7},
+  'IT3711':{name:'Summer Internship',credits:2,semester:7},
+  'GE3751':{name:'Principles of Management',credits:3,semester:7},
+  'GE3752':{name:'Total Quality Management',credits:3,semester:7},
+  'GE3753':{name:'Engineering Economics and Financial Accounting',credits:3,semester:7},
+  'GE3754':{name:'Human Resource Management',credits:3,semester:7},
+  'GE3755':{name:'Knowledge Management',credits:3,semester:7},
+  'GE3792':{name:'Industrial Management',credits:3,semester:7},
+  // SEMESTER 8
+  'IT3811':{name:'Project Work / Internship',credits:10,semester:8},
+  'CB3591':{name:'Engineering Secure Software Systems',credits:3,semester:8},
+  'MX3081':{name:'Introduction to Women and Gender Studies',credits:3,semester:8},
+  'MX3084':{name:'Disaster Risk Reduction and Management',credits:3,semester:8},
+  'MX3085':{name:'Well Being with Traditional Practices - Yoga, Ayurveda and Siddha',credits:3,semester:8},
+  'MX3086':{name:'History of Science and Technology in India',credits:3,semester:8},
+  'MX3087':{name:'Political and Economic Thought for a Humane Society',credits:3,semester:8},
+  'MX3088':{name:'State, Nation Building and Politics in India',credits:3,semester:8},
+  'AU3791':{name:'Electric and Hybrid Vehicles',credits:3,semester:8},
+  'MF3003':{name:'Reverse Engineering',credits:3,semester:8},
+};
+
+// ── STATE ──────────────────────────────────────────────────────
+const GP={O:10,'A+':9,A:8,'B+':7,B:6,C:5,F:0};
+let students=[],curRole='',curUser={},arSID=null;
+
+// ── API ────────────────────────────────────────────────────────
+async function api(m,p,b){
+  try{
+    const o={method:m,headers:{'Content-Type':'application/json'}};
+    if(b)o.body=JSON.stringify(b);
+    const r=await fetch(API+p,o);const d=await r.json();
+    if(!r.ok)throw new Error(d.detail||'Error');
+    return{ok:true,data:d};
+  }catch(e){return{ok:false,err:e.message};}
+}
+
+async function checkStatus(){
+  const dot=document.getElementById('sdot'),txt=document.getElementById('stxt');
+  const r=await api('GET','/health');
+  dot.className=r.ok?'dot':'dot off';txt.textContent=r.ok?'Online':'Offline';
+}
+
+// ── ROLE / LOGIN ───────────────────────────────────────────────
+function setRole(role){
+  curRole=role;
+  document.getElementById('rb-admin').classList.toggle('active',role==='admin');
+  document.getElementById('rb-student').classList.toggle('active',role==='student');
+  document.getElementById('af').style.display=role==='admin'?'block':'none';
+  document.getElementById('sf').style.display=role==='student'?'block':'none';
+}
+setRole('admin');
+
+async function doLogin(){
+  const err=document.getElementById('lerr');err.textContent='';
+  toast('Signing in…','info');
+  if(curRole==='admin'){
+    const u=document.getElementById('lu').value.trim(),p=document.getElementById('lp').value;
+    if(!u||!p){err.textContent='❌ Enter credentials';return;}
+    const r=await api('POST','/login/admin',{username:u,password:p});
+    if(r.ok){curUser={role:'admin',name:u};launch();}
+    else err.textContent='❌ '+(r.err||'Invalid credentials');
+  }else{
+    const reg=document.getElementById('lr').value.trim(),pw=document.getElementById('lsp').value;
+    if(!reg||!pw){err.textContent='❌ Enter register number and password';return;}
+    const r=await api('POST','/login/student',{reg_no:reg,password:pw});
+    if(r.ok){curUser={role:'student',...r.data};launch();}
+    else err.textContent='❌ '+(r.err||'Invalid credentials');
+  }
+}
+
+function launch(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('rpill').textContent=curUser.role==='admin'?'Admin':'Student';
+  document.getElementById('rpill').className='rpill '+(curUser.role==='admin'?'admin':'student');
+  document.getElementById('upill').textContent='👤 '+curUser.name;
+  buildNav();checkStatus();
+  if(curUser.role==='admin'){
+    loadStudents().then(()=>{loadDashboard();loadRankList();});
+  }else{
+    arSID=curUser.student_id;
+    document.getElementById('arsel-info').style.display='block';
+    document.getElementById('arsel-info').textContent=`✓ ${curUser.name} — ${curUser.reg_no}`;
+    document.getElementById('adm-stu-search').style.display='none';
+    document.getElementById('adm-search').style.display='none';
+    document.getElementById('rsub').textContent='Your academic results';
+    viewResults(curUser.student_id);
+    navTo('results');
+  }
+}
+
+function doLogout(){
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app').style.display='none';
+  curUser={};arSID=null;students=[];
+  ['lu','lp','lr','lsp'].forEach(id=>document.getElementById(id).value='');
+  setRole('admin');
+}
+
+// ── NAV ────────────────────────────────────────────────────────
+function buildNav(){
+  const isAdmin=curUser.role==='admin';
+  const adminNav=`
+    <div class="nsec">Main</div>
+    <div class="nitem active" data-page="dashboard" onclick="nav(this)"><span class="nicon">🏠</span>Dashboard</div>
+    <div class="nitem" data-page="students" onclick="nav(this)"><span class="nicon">👨‍🎓</span>Students</div>
+    <div class="nitem" data-page="results" onclick="nav(this)"><span class="nicon">📊</span>View Results</div>
+    <div class="nitem" data-page="add-result" onclick="nav(this)"><span class="nicon">➕</span>Add Result</div>
+    <div class="nsec">Analytics</div>
+    <div class="nitem" data-page="ranklist" onclick="nav(this)"><span class="nicon">🏆</span>Rank List</div>
+    <div class="sfoot"><div class="scopy">© 2026 <strong>Osborn Matthew A I</strong><br/>All Rights Reserved<br/>MCET · Anna University</div></div>`;
+  const stuNav=`
+    <div class="nsec">My Portal</div>
+    <div class="nitem active" data-page="results" onclick="nav(this)"><span class="nicon">📊</span>My Results</div>
+    <div class="nitem" data-page="add-result" onclick="nav(this)"><span class="nicon">➕</span>Add Result</div>
+    <div class="nitem" data-page="password" onclick="nav(this)"><span class="nicon">🔑</span>Change Password</div>
+    <div class="sfoot"><div class="scopy">© 2026 <strong>Osborn Matthew A I</strong><br/>All Rights Reserved<br/>MCET · Anna University</div></div>`;
+  const adminMob=`<div class="mnitems">
+    <div class="mni active" data-page="dashboard" onclick="navMob(this)"><span class="nicon">🏠</span>Home</div>
+    <div class="mni" data-page="students" onclick="navMob(this)"><span class="nicon">👨‍🎓</span>Students</div>
+    <div class="mni" data-page="results" onclick="navMob(this)"><span class="nicon">📊</span>Results</div>
+    <div class="mni" data-page="add-result" onclick="navMob(this)"><span class="nicon">➕</span>Add</div>
+    <div class="mni" data-page="ranklist" onclick="navMob(this)"><span class="nicon">🏆</span>Ranks</div>
+  </div>`;
+  const stuMob=`<div class="mnitems">
+    <div class="mni active" data-page="results" onclick="navMob(this)"><span class="nicon">📊</span>Results</div>
+    <div class="mni" data-page="add-result" onclick="navMob(this)"><span class="nicon">➕</span>Add</div>
+    <div class="mni" data-page="password" onclick="navMob(this)"><span class="nicon">🔑</span>Password</div>
+  </div>`;
+  document.getElementById('sidebar').innerHTML=isAdmin?adminNav:stuNav;
+  document.getElementById('mobnav').innerHTML=isAdmin?adminMob:stuMob;
+}
+
+function nav(el){
+  document.querySelectorAll('.nitem').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+el.dataset.page).classList.add('active');
+  document.querySelectorAll('.mni').forEach(n=>n.classList.toggle('active',n.dataset.page===el.dataset.page));
+  if(el.dataset.page==='dashboard')loadDashboard();
+  if(el.dataset.page==='ranklist')loadRankList();
+}
+function navMob(el){
+  document.querySelectorAll('.mni').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.nitem').forEach(n=>n.classList.toggle('active',n.dataset.page===el.dataset.page));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+el.dataset.page).classList.add('active');
+  if(el.dataset.page==='dashboard')loadDashboard();
+  if(el.dataset.page==='ranklist')loadRankList();
+}
+function navTo(page){
+  document.querySelectorAll('.nitem,.mni').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+}
+
+// ── AUTO FILL ──────────────────────────────────────────────────
+function autoFill(){
+  const code=document.getElementById('arcode').value.trim().toUpperCase();
+  document.getElementById('arcode').value=code;
+  const hint=document.getElementById('afhint');
+  if(SUBDB[code]){
+    const s=SUBDB[code];
+    document.getElementById('arname').value=s.name;
+    document.getElementById('arcred').value=s.credits;
+    if(!document.getElementById('arsem').value) document.getElementById('arsem').value=s.semester;
+    hint.className='af-hint found';hint.style.display='block';
+    hint.textContent=`✅ Auto-filled from Anna University B.Tech IT curriculum — ${s.credits} credits, Semester ${s.semester}`;
+  }else if(code.length>=5){
+    hint.className='af-hint notfound';hint.style.display='block';
+    hint.textContent='⚠️ Subject code not in curriculum database — please enter name and credits manually';
+  }else{hint.style.display='none';}
+}
+
+// ── GPA ────────────────────────────────────────────────────────
+function gpa(list){
+  const v=list.filter(r=>r.grade!=='F');if(!v.length)return 0;
+  const pts=v.reduce((a,r)=>a+(GP[r.grade]||0)*parseFloat(r.credits),0);
+  const cr=v.reduce((a,r)=>a+parseFloat(r.credits),0);
+  return cr?Math.round(pts/cr*100)/100:0;
+}
+
+// ── DASHBOARD ──────────────────────────────────────────────────
+async function loadDashboard(){
+  const r=await api('GET','/dashboard');
+  const depts=new Set(students.map(s=>s.department));
+  const wc=await Promise.all(students.map(async s=>{
+    const rr=await api('GET',`/results/${s.id}`);
+    return{...s,cgpa:gpa(rr.ok?rr.data:[]),res:rr.ok?rr.data:[]};
+  }));
+  const top=wc.slice().sort((a,b)=>b.cgpa-a.cgpa)[0];
+  document.getElementById('sgrid').innerHTML=`
+    <div class="sbox g"><div class="sico">👨‍🎓</div><div class="snum">${students.length}</div><div class="slbl">Total Students</div></div>
+    <div class="sbox p"><div class="sico">📋</div><div class="snum">${r.ok?r.data.total_results:0}</div><div class="slbl">Total Results</div></div>
+    <div class="sbox gr"><div class="sico">🏆</div><div class="snum">${top?top.cgpa:'—'}</div><div class="slbl">Top CGPA</div><div class="shint">${top?top.name:''}</div></div>
+    <div class="sbox b"><div class="sico">🏛️</div><div class="snum">${depts.size}</div><div class="slbl">Departments</div></div>`;
+
+  // Chart A
+  const dm={};wc.forEach(s=>{if(!dm[s.department])dm[s.department]={t:0,c:0};dm[s.department].t+=s.cgpa;dm[s.department].c++;});
+  document.getElementById('cdept').innerHTML=Object.entries(dm).length?
+    Object.entries(dm).map(([d,v])=>{const avg=Math.round(v.t/v.c*100)/100;const sh=d.length>14?d.substring(0,14)+'…':d;
+      return`<div class="br"><div class="bn" title="${d}">${sh}</div><div class="bt"><div class="bf" style="width:${(avg/10)*100}%"></div></div><div class="bv">${avg}</div></div>`;}).join('')
+    :`<div style="color:var(--muted);text-align:center;padding:16px;font-size:.82rem">No data yet</div>`;
+
+  // Chart D
+  const tops=[];
+  depts.forEach(dept=>{
+    const ds=wc.filter(s=>s.department===dept).sort((a,b)=>b.cgpa-a.cgpa);
+    if(ds.length)tops.push({dept,t:ds[0]});
+  });
+  document.getElementById('ctop').innerHTML=tops.length?
+    `<thead><tr><th></th><th>Name</th><th>Dept</th><th>CGPA</th></tr></thead>
+    <tbody>${tops.sort((a,b)=>b.t.cgpa-a.t.cgpa).map((x,i)=>`<tr>
+      <td>${i===0?'🥇':i===1?'🥈':i===2?'🥉':'⭐'}</td>
+      <td><strong>${x.t.name}</strong><div style="font-size:.68rem;color:var(--muted)">${x.t.reg_no}</div></td>
+      <td style="color:var(--muted);font-size:.75rem">${x.dept.length>12?x.dept.substring(0,12)+'…':x.dept}</td>
+      <td style="color:var(--gold);font-weight:700;font-family:var(--fh);font-size:1.1rem">${x.t.cgpa}</td>
+    </tr>`).join('')}</tbody>`
+    :`<tr><td colspan="4"><div style="color:var(--muted);text-align:center;padding:16px;font-size:.82rem">No data yet</div></td></tr>`;
+}
+
+// ── STUDENTS ───────────────────────────────────────────────────
+async function loadStudents(){
+  const r=await api('GET','/students');students=r.ok?r.data:[];renderStudents(students);
+}
+function renderStudents(list){
+  const tb=document.getElementById('sbody');
+  if(!list.length){tb.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="eico">👨‍🎓</div>No students yet</div></td></tr>`;return;}
+  tb.innerHTML=list.map((s,i)=>`<tr>
+    <td style="color:var(--muted)">${i+1}</td>
+    <td><strong>${s.name}</strong></td>
+    <td><code>${s.reg_no}</code></td>
+    <td><span class="badge bdept">${s.department}</span></td>
+    <td><span class="badge byear">Year ${s.year}</span></td>
+    <td style="color:var(--muted);font-size:.79rem">${s.email||'—'}</td>
+    <td style="display:flex;gap:5px;flex-wrap:wrap;">
+      <button class="btn btn-ghost btn-sm" onclick="openEdit(${s.id})">Edit</button>
+      <button class="btn btn-red btn-sm" onclick="delStu(${s.id})">Del</button>
+    </td>
+  </tr>`).join('');
+}
+function searchStudents(){
+  const q=document.getElementById('sinp').value.toLowerCase();
+  renderStudents(q?students.filter(s=>s.name.toLowerCase().includes(q)||s.reg_no.toLowerCase().includes(q)):students);
+}
+function openAdd(){
+  document.getElementById('mtitle').textContent='Add Student';
+  document.getElementById('mid').value='';
+  ['mname','mreg','memail'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('myear').value='1';
+  document.getElementById('smodal').classList.add('open');
+}
+function openEdit(id){
+  const s=students.find(x=>x.id===id);if(!s)return;
+  document.getElementById('mtitle').textContent='Edit Student';
+  document.getElementById('mid').value=s.id;
+  document.getElementById('mname').value=s.name;
+  document.getElementById('mreg').value=s.reg_no;
+  document.getElementById('mdept').value=s.department;
+  document.getElementById('myear').value=s.year;
+  document.getElementById('memail').value=s.email||'';
+  document.getElementById('smodal').classList.add('open');
+}
+function closeMod(id){document.getElementById(id).classList.remove('open');}
+async function saveStu(){
+  const id=document.getElementById('mid').value;
+  const body={name:document.getElementById('mname').value.trim(),reg_no:document.getElementById('mreg').value.trim(),department:document.getElementById('mdept').value,year:parseInt(document.getElementById('myear').value),email:document.getElementById('memail').value.trim()};
+  if(!body.name||!body.reg_no){toast('Name and Register Number required','err');return;}
+  const r=id?await api('PUT',`/students/${id}`,body):await api('POST','/students',body);
+  if(r.ok){closeMod('smodal');await loadStudents();loadDashboard();toast(id?'Updated ✓':'Added ✓','ok');}
+  else toast('Error: '+r.err,'err');
+}
+async function delStu(id){
+  if(!confirm('Delete this student and all their results?'))return;
+  const r=await api('DELETE',`/students/${id}`);
+  if(r.ok){await loadStudents();loadDashboard();loadRankList();toast('Deleted','ok');}
+  else toast('Error: '+r.err,'err');
+}
+
+// ── RESULTS ────────────────────────────────────────────────────
+function searchForResult(){
+  const q=document.getElementById('rsinp').value.toLowerCase();
+  const list=document.getElementById('rslist'),body=document.getElementById('rsbody');
+  if(!q){list.style.display='none';return;}
+  const found=students.filter(s=>s.name.toLowerCase().includes(q)||s.reg_no.toLowerCase().includes(q));
+  if(!found.length){list.style.display='none';return;}
+  list.style.display='block';
+  body.innerHTML=found.map(s=>`<tr>
+    <td><strong>${s.name}</strong></td><td>${s.reg_no}</td>
+    <td>${s.department}</td><td>Year ${s.year}</td>
+    <td><button class="btn btn-gold btn-sm" onclick="viewResults(${s.id})">View</button></td>
+  </tr>`).join('');
+}
+function gb(g){
+  const m={O:'gO','A+':'gAp',A:'gA','B+':'gBp',B:'gB',C:'gC',F:'gF'};
+  return`<span class="badge ${m[g]||''}">${g}</span>`;
+}
+async function viewResults(sid){
+  if(curUser.role==='admin')document.getElementById('rslist').style.display='none';
+  const rv=document.getElementById('rview');
+  rv.innerHTML=`<div class="empty"><div class="eico">⏳</div>Loading…</div>`;
+  const r=await api('GET',`/results/${sid}`);
+  const sRes=r.ok?r.data:[];
+  const s=curUser.role==='student'?curUser:students.find(x=>x.id===sid);
+  const cgpa=gpa(sRes);
+  const totalCr=sRes.filter(x=>x.grade!=='F').reduce((a,r)=>a+parseFloat(r.credits),0);
+  const sems={};sRes.forEach(r=>{(sems[r.semester]=sems[r.semester]||[]).push(r);});
+  const sName=s?.name||sRes[0]?.name||'Student';
+  const sReg=s?.reg_no||sRes[0]?.reg_no||'';
+  const sDept=s?.department||sRes[0]?.department||'';
+  const sYear=s?.year||sRes[0]?.year||'';
+  rv.innerHTML=`
+    <div class="ebar">
+      <button class="btn btn-blue" onclick="exportPDF(${sid})">📄 Export PDF</button>
+      <button class="btn btn-purple" onclick="exportImg(${sid})">🖼 Export Image</button>
+    </div>
+    <div class="rhd">
+      <div><h2>${sName}</h2><p>${sReg} · ${sDept} · Year ${sYear}</p></div>
+      <div class="grow">
+        <div class="gpill"><div class="gnum">${cgpa}</div><div class="glbl">CGPA</div></div>
+        <div class="gpill"><div class="gnum">${totalCr}</div><div class="glbl">Credits</div></div>
+        <div class="gpill"><div class="gnum">${sRes.length}</div><div class="glbl">Subjects</div></div>
+      </div>
+    </div>
+    ${Object.keys(sems).sort((a,b)=>a-b).map(sem=>{
+      const rows=sems[sem];const g=gpa(rows);const tc=rows.reduce((a,r)=>a+parseFloat(r.credits),0);
+      return`<div class="ssec">
+        <div class="shead">📅 Semester ${sem}<span class="stag">GPA: ${g} | Credits: ${tc}</span></div>
+        <div class="tc"><table>
+          <thead><tr><th>Code</th><th>Subject Name</th><th>Credits</th><th>Grade</th><th>Points</th>${curUser.role==='admin'?'<th></th>':''}</tr></thead>
+          <tbody>${rows.map(r=>`<tr>
+            <td><code>${r.subject_code}</code></td>
+            <td><strong>${r.subject_name}</strong></td>
+            <td style="text-align:center">${r.credits}</td>
+            <td>${gb(r.grade)}</td>
+            <td style="color:var(--gold);font-weight:700">${GP[r.grade]||0}</td>
+            ${curUser.role==='admin'?`<td><button class="btn btn-red btn-sm" onclick="delRes(${r.id},${sid})">×</button></td>`:''}
+          </tr>`).join('')}</tbody>
+        </table></div>
+      </div>`;}).join('')}
+    ${!sRes.length?`<div class="empty"><div class="eico">📭</div>No results yet</div>`:''}`;
+}
+async function delRes(rid,sid){
+  if(!confirm('Delete this result?'))return;
+  const r=await api('DELETE',`/results/${rid}`);
+  if(r.ok){toast('Deleted','ok');viewResults(sid);loadDashboard();loadRankList();}
+  else toast('Error: '+r.err,'err');
+}
+
+// ── ADD RESULT ─────────────────────────────────────────────────
+function arSearch(){
+  const q=document.getElementById('arsch').value.toLowerCase();
+  const el=document.getElementById('arlist'),sel=document.getElementById('arsel');
+  if(!q){el.style.display='none';return;}
+  const found=students.filter(s=>s.name.toLowerCase().includes(q)||s.reg_no.toLowerCase().includes(q));
+  if(!found.length){el.style.display='none';return;}
+  el.style.display='block';
+  sel.innerHTML=found.map(s=>`<option value="${s.id}">${s.name} (${s.reg_no})</option>`).join('');
+}
+function selAR(){
+  arSID=parseInt(document.getElementById('arsel').value);
+  const s=students.find(x=>x.id===arSID);
+  document.getElementById('arsel-info').style.display='block';
+  document.getElementById('arsel-info').textContent=`✓ ${s.name} — ${s.reg_no} — ${s.department}`;
+  document.getElementById('arlist').style.display='none';
+}
+async function submitResult(){
+  if(!arSID){toast('Select a student first','err');return;}
+  const code=document.getElementById('arcode').value.trim().toUpperCase();
+  const name=document.getElementById('arname').value.trim();
+  const grade=document.getElementById('argrade').value;
+  const credits=parseFloat(document.getElementById('arcred').value);
+  const sem=parseInt(document.getElementById('arsem').value);
+  if(!code){toast('Enter subject code','err');return;}
+  if(!name){toast('Enter subject name','err');return;}
+  if(isNaN(credits)||credits<=0){toast('Enter valid credits','err');return;}
+  if(isNaN(sem)||sem<1||sem>8){toast('Enter valid semester (1–8)','err');return;}
+  const r=await api('POST','/results',{student_id:arSID,subject_code:code,subject_name:name,grade,credits,semester:sem});
+  if(r.ok){
+    toast('Result saved ✓','ok');
+    ['arcode','arname','arcred','arsem'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('argrade').value='O';
+    document.getElementById('afhint').style.display='none';
+    if(curUser.role==='admin'){loadDashboard();loadRankList();}
+    else{viewResults(curUser.student_id);}
+  }else toast('Error: '+r.err,'err');
+}
+
+// ── CHANGE PASSWORD ────────────────────────────────────────────
+async function changePW(){
+  const old=document.getElementById('cpold').value;
+  const nw=document.getElementById('cpnew').value;
+  const conf=document.getElementById('cpconf').value;
+  if(!old||!nw){toast('Fill all fields','err');return;}
+  if(nw!==conf){toast('Passwords do not match','err');return;}
+  if(nw.length<4){toast('Password too short (min 4)','err');return;}
+  const r=await api('POST','/change-password',{reg_no:curUser.reg_no,old_password:old,new_password:nw});
+  if(r.ok){toast('Password changed ✓','ok');['cpold','cpnew','cpconf'].forEach(id=>document.getElementById(id).value='');}
+  else toast('Error: '+r.err,'err');
+}
+
+// ── RANK LIST ──────────────────────────────────────────────────
+async function loadRankList(){
+  const dept=document.getElementById('rdept')?.value||'all';
+  let list=dept==='all'?students:students.filter(s=>s.department===dept);
+  const con=document.getElementById('rcon');
+  con.innerHTML=`<div class="empty"><div class="eico">⏳</div>Loading…</div>`;
+  const ranked=await Promise.all(list.map(async s=>{
+    const r=await api('GET',`/results/${s.id}`);const res=r.ok?r.data:[];
+    return{...s,cgpa:gpa(res),cr:res.filter(x=>x.grade!=='F').reduce((a,r)=>a+parseFloat(r.credits),0),sub:res.length};
+  }));
+  ranked.sort((a,b)=>b.cgpa-a.cgpa);
+  if(!ranked.length){con.innerHTML=`<div class="empty"><div class="eico">🏆</div>No students</div>`;return;}
+  con.innerHTML=ranked.map((s,i)=>`
+    <div class="ri" onclick="goRes(${s.id})">
+      <div class="rno">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+      <div class="rinfo"><div class="rname">${s.name}</div>
+        <div class="rsub">${s.reg_no} · ${s.department} · Year ${s.year} · ${s.sub} subjects · ${s.cr} credits</div></div>
+      <div class="rcgpa">${s.cgpa}</div>
+    </div>`).join('');
+}
+function goRes(sid){
+  navTo('results');
+  document.querySelectorAll('.nitem').forEach(n=>n.classList.toggle('active',n.dataset.page==='results'));
+  document.querySelectorAll('.mni').forEach(n=>n.classList.toggle('active',n.dataset.page==='results'));
+  viewResults(sid);
+}
+
+// ── MARKSHEET ──────────────────────────────────────────────────
+async function buildMS(sid){
+  const s=curUser.role==='student'?curUser:students.find(x=>x.id===sid);
+  const r=await api('GET',`/results/${sid}`);const res=r.ok?r.data:[];
+  const cg=gpa(res);const sems={};
+  res.forEach(r=>{(sems[r.semester]=sems[r.semester]||[]).push(r);});
+  const now=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  const nm=s?.name||res[0]?.name||'Student';
+  const rg=s?.reg_no||res[0]?.reg_no||'';
+  const dp=s?.department||res[0]?.department||'';
+  const yr=s?.year||res[0]?.year||'';
+  const html=`<div class="msp" id="ms-${sid}">
+    <div class="mshd">
+      <div class="mscol">Marthandam College of Engineering and Technology</div>
+      <div class="msaff">Kuttakuzhi, Kanyakumari — Affiliated to Anna University, Chennai</div>
+      <div class="mstit">Student Result Marksheet</div>
+      <div class="msdt">Generated on ${now}</div>
+    </div>
+    <div class="msinf">
+      <div><span class="ml">Student Name</span><span class="mv">${nm}</span></div>
+      <div><span class="ml">Register Number</span><span class="mv">${rg}</span></div>
+      <div><span class="ml">Department</span><span class="mv">${dp}</span></div>
+      <div><span class="ml">Year of Study</span><span class="mv">${yr}</span></div>
+      <div><span class="ml">Overall CGPA</span><span class="mv" style="font-size:1.1rem">${cg} / 10.0</span></div>
+      <div><span class="ml">Email</span><span class="mv">${s?.email||'—'}</span></div>
+    </div>
+    ${Object.keys(sems).sort((a,b)=>a-b).map(sem=>{
+      const rows=sems[sem];const g=gpa(rows);const tc=rows.reduce((a,r)=>a+parseFloat(r.credits),0);
+      return`<div style="margin-bottom:18px;">
+        <div class="mssemhd">SEMESTER ${sem} &nbsp;|&nbsp; GPA: ${g} &nbsp;|&nbsp; Credits: ${tc}</div>
+        <table class="mst">
+          <thead><tr><th>Code</th><th>Subject Name</th><th>Credits</th><th>Grade</th><th>Points</th></tr></thead>
+          <tbody>
+            ${rows.map(r=>`<tr>
+              <td>${r.subject_code}</td><td>${r.subject_name}</td>
+              <td style="text-align:center">${r.credits}</td>
+              <td style="font-weight:700;color:${r.grade==='F'?'#dc2626':r.grade==='O'?'#16a34a':'#1a1a2e'}">${r.grade}</td>
+              <td style="text-align:center">${GP[r.grade]||0}</td>
+            </tr>`).join('')}
+            <tr class="smr"><td colspan="2">Semester GPA</td><td style="text-align:center">${tc}</td><td colspan="2" style="text-align:center">${g}</td></tr>
+          </tbody>
+        </table>
+      </div>`;}).join('')}
+    <div class="msft">Overall CGPA: <strong>${cg}</strong> / 10.0 &nbsp;|&nbsp; O=10, A+=9, A=8, B+=7, B=6, C=5, F=0 (Anna University)</div>
+    <div class="msdev">© 2026 Osborn Matthew A I · SRMS · Marthandam College of Engineering and Technology</div>
+  </div>`;
+  return{s:{name:nm,reg_no:rg},html};
+}
+
+async function showMS(sid){
+  const d=await buildMS(sid);if(!d)return null;
+  const con=document.getElementById('msc');
+  con.innerHTML=d.html;
+  con.style.cssText='position:fixed;left:0;top:0;z-index:9999;background:#fff;width:860px;padding:0;visibility:visible;';
+  await new Promise(r=>setTimeout(r,1000));
+  return{el:document.getElementById(`ms-${sid}`),s:d.s};
+}
+function hideMS(){
+  const con=document.getElementById('msc');
+  con.style.cssText='position:fixed;left:-9999px;top:0;z-index:-1;background:#fff;';
+  con.innerHTML='';
+}
+async function exportPDF(sid){
+  toast('Generating PDF…','info');const d=await showMS(sid);if(!d)return;
+  try{
+    const canvas=await html2canvas(d.el,{scale:2,backgroundColor:'#fff',useCORS:true,logging:false});
+    const{jsPDF}=window.jspdf;const pdf=new jsPDF('p','mm','a4');
+    const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight();
+    const ratio=pw/canvas.width,sh=canvas.height*ratio;
+    if(sh<=ph){pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,pw,sh);}
+    else{
+      const rpp=Math.floor(ph/ratio);let y=0,pg=0;
+      while(y<canvas.height){
+        const sl=Math.min(rpp,canvas.height-y);
+        const c2=document.createElement('canvas');c2.width=canvas.width;c2.height=sl;
+        c2.getContext('2d').drawImage(canvas,0,y,canvas.width,sl,0,0,canvas.width,sl);
+        if(pg>0)pdf.addPage();pdf.addImage(c2.toDataURL('image/png'),'PNG',0,0,pw,sl*ratio);
+        y+=sl;pg++;
+      }
+    }
+    pdf.save(`${d.s.name}_${d.s.reg_no}_marksheet.pdf`);toast('PDF downloaded ✓','ok');
+  }catch(e){toast('Error: '+e.message,'err');}
+  hideMS();
+}
+async function exportImg(sid){
+  toast('Generating Image…','info');const d=await showMS(sid);if(!d)return;
+  try{
+    const canvas=await html2canvas(d.el,{scale:2,backgroundColor:'#fff',useCORS:true,logging:false});
+    const link=document.createElement('a');
+    link.download=`${d.s.name}_${d.s.reg_no}_marksheet.png`;
+    link.href=canvas.toDataURL('image/png');
+    document.body.appendChild(link);link.click();document.body.removeChild(link);
+    toast('Image downloaded ✓','ok');
+  }catch(e){toast('Error: '+e.message,'err');}
+  hideMS();
+}
+async function exportAllPDF(){
+  if(!students.length){toast('No students','err');return;}
+  const dept=document.getElementById('rdept').value;
+  const list=dept==='all'?students:students.filter(s=>s.department===dept);
+  toast(`Generating ${list.length} marksheets…`,'info');
+  const{jsPDF}=window.jspdf;const pdf=new jsPDF('p','mm','a4');
+  let first=true;
+  for(const s of list){
+    const d=await showMS(s.id);if(!d){hideMS();continue;}
+    try{
+      const canvas=await html2canvas(d.el,{scale:2,backgroundColor:'#fff',useCORS:true,logging:false});
+      const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight();
+      const ratio=pw/canvas.width,sh=canvas.height*ratio;
+      if(!first)pdf.addPage();
+      pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,pw,Math.min(sh,ph));
+      first=false;
+    }catch(e){console.error(e);}
+    hideMS();await new Promise(r=>setTimeout(r,300));
+  }
+  if(!first){pdf.save('all_students_marksheet.pdf');toast('Downloaded ✓','ok');}
+  else toast('No results to export','err');
+}
+
+// ── TOAST ──────────────────────────────────────────────────────
+function toast(msg,type='ok'){
+  const el=document.getElementById('toast');
+  el.textContent=(type==='ok'?'✅':type==='err'?'❌':'ℹ️')+' '+msg;
+  el.className=`toast ${type} show`;
+  setTimeout(()=>el.classList.remove('show'),3500);
+}
+</script>
+</body>
+</html>
