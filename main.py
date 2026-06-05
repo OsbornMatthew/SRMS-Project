@@ -11,18 +11,20 @@ app = FastAPI(title="SRMS - Osborn Matthew A I")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["*"],
+    allow_credentials=False,
+    allow_methods=["GET","POST","PUT","DELETE","OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 def get_db():
     return mysql.connector.connect(
-        host="mysql-34014e96-osbornmatthew.l.aivencloud.com",
-        port=22276,
-        user="avnadmin",
-        password="YOUR_AIVEN_PASSWORD",
-        database="defaultdb",
-        ssl_disabled=False
+        host=os.environ.get("DB_HOST","localhost"),
+        port=int(os.environ.get("DB_PORT","3306")),
+        user=os.environ.get("DB_USER","root"),
+        password=os.environ.get("DB_PASSWORD",""),
+        database=os.environ.get("DB_NAME","student_db"),
+        ssl_disabled=os.environ.get("DB_SSL","true").lower()=="true"
     )
 
 def hash_pw(pw): return hashlib.sha256(pw.encode()).hexdigest()
