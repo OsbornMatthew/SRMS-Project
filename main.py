@@ -19,12 +19,12 @@ app.add_middleware(
 
 def get_db():
     return mysql.connector.connect(
-        host=os.environ.get("DB_HOST","mysql-34014e96-osbornmatthew.l.aivencloud.com"),
-        port=int(os.environ.get("DB_PORT","22276")),
-        user=os.environ.get("DB_USER","avnadmin"),
-        password=os.environ.get("DB_PASSWORD","AVNS_7mQ80zqZuSLI5Sx0JPR"),
-        database=os.environ.get("DB_NAME","defaultdb"),
-        ssl_disabled=os.environ.get("DB_SSL","tfalse").lower()=="false"
+        host=os.environ.get("DB_HOST","localhost"),
+        port=int(os.environ.get("DB_PORT","3306")),
+        user=os.environ.get("DB_USER","root"),
+        password=os.environ.get("DB_PASSWORD",""),
+        database=os.environ.get("DB_NAME","student_db"),
+        ssl_disabled=os.environ.get("DB_SSL","true").lower()=="true"
     )
 
 def hash_pw(pw): return hashlib.sha256(pw.encode()).hexdigest()
