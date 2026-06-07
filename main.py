@@ -61,8 +61,9 @@ class PasswordChange(BaseModel):
     old_password: str
     new_password: str
 
-@app.get("/health")
-def health(): return {"status":"ok","dev":"Osborn Matthew A I"}
+@app.api_route("/health", methods=["GET","HEAD"])
+def health():
+    return {"status":"ok","dev":"Osborn Matthew A I"}
 
 @app.post("/login/admin")
 def admin_login(data: AdminLogin):
