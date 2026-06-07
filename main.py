@@ -17,7 +17,7 @@ app.add_middleware(
 
 def get_db():
     return mysql.connector.connect(
-        host="mysql-34014e96-osbornmatthew.l.aivencloud.com",
+        host="mysql-34014e96-osbornmatthew.i.aivencloud.com",
         port=22276,
         user="avnadmin",
         password="AVNS_7mQ80zqZuSLI5Sx0JPR",
