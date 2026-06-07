@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from typing import Optional
 import mysql.connector
 import hashlib
-import os
 
 app = FastAPI(title="SRMS - Osborn Matthew A I")
 
@@ -14,7 +13,6 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["GET","POST","PUT","DELETE","OPTIONS"],
     allow_headers=["*"],
-    expose_headers=["*"],
 )
 
 def get_db():
@@ -69,7 +67,8 @@ def health(): return {"status":"ok","dev":"Osborn Matthew A I"}
 @app.post("/login/admin")
 def admin_login(data: AdminLogin):
     db=get_db(); cur=db.cursor(dictionary=True)
-    cur.execute("SELECT * FROM admins WHERE username=%s AND password=%s",(data.username,hash_pw(data.password)))
+    cur.execute("SELECT * FROM admins WHERE username=%s AND password=%s",
+                (data.username,hash_pw(data.password)))
     a=cur.fetchone(); db.close()
     if not a: raise HTTPException(401,"Invalid credentials")
     return {"message":"ok","role":"admin"}
@@ -77,32 +76,38 @@ def admin_login(data: AdminLogin):
 @app.post("/login/student")
 def student_login(data: StudentLogin):
     db=get_db(); cur=db.cursor(dictionary=True)
-    cur.execute("SELECT * FROM students WHERE reg_no=%s AND password=%s",(data.reg_no,hash_pw(data.password)))
+    cur.execute("SELECT * FROM students WHERE reg_no=%s AND password=%s",
+                (data.reg_no,hash_pw(data.password)))
     s=cur.fetchone(); db.close()
     if not s: raise HTTPException(401,"Invalid register number or password")
-    return {"message":"ok","role":"student","student_id":s["id"],"name":s["name"],"reg_no":s["reg_no"],"department":s["department"],"year":s["year"],"email":s.get("email","")}
+    return {"message":"ok","role":"student","student_id":s["id"],
+            "name":s["name"],"reg_no":s["reg_no"],
+            "department":s["department"],"year":s["year"],"email":s.get("email","")}
 
 @app.post("/change-password")
 def change_password(data: PasswordChange):
     db=get_db(); cur=db.cursor(dictionary=True)
-    cur.execute("SELECT * FROM students WHERE reg_no=%s AND password=%s",(data.reg_no,hash_pw(data.old_password)))
+    cur.execute("SELECT * FROM students WHERE reg_no=%s AND password=%s",
+                (data.reg_no,hash_pw(data.old_password)))
     s=cur.fetchone()
     if not s: db.close(); raise HTTPException(401,"Wrong current password")
-    cur.execute("UPDATE students SET password=%s WHERE reg_no=%s",(hash_pw(data.new_password),data.reg_no))
+    cur.execute("UPDATE students SET password=%s WHERE reg_no=%s",
+                (hash_pw(data.new_password),data.reg_no))
     db.commit(); db.close()
     return {"message":"Password changed"}
 
 @app.get("/students")
 def get_students():
     db=get_db(); cur=db.cursor(dictionary=True)
-    cur.execute("SELECT id,name,reg_no,department,year,email,created_at FROM students ORDER BY name")
+    cur.execute("SELECT id,name,reg_no,department,year,email FROM students ORDER BY name")
     rows=cur.fetchall(); db.close(); return rows
 
 @app.post("/students")
 def create_student(data: StudentCreate):
     db=get_db(); cur=db.cursor()
     try:
-        cur.execute("INSERT INTO students (name,reg_no,department,year,email,password) VALUES (%s,%s,%s,%s,%s,%s)",
+        cur.execute(
+            "INSERT INTO students (name,reg_no,department,year,email,password) VALUES (%s,%s,%s,%s,%s,%s)",
             (data.name,data.reg_no,data.department,data.year,data.email,hash_pw(data.reg_no)))
         db.commit(); sid=cur.lastrowid
     except Exception as e: db.close(); raise HTTPException(400,str(e))
@@ -137,7 +142,8 @@ def add_result(data:ResultCreate):
     if data.grade not in ['O','A+','A','B+','B','C','F']:
         raise HTTPException(400,"Invalid grade")
     db=get_db(); cur=db.cursor()
-    cur.execute("INSERT INTO results (student_id,subject_code,subject_name,grade,credits,semester) VALUES (%s,%s,%s,%s,%s,%s)",
+    cur.execute(
+        "INSERT INTO results (student_id,subject_code,subject_name,grade,credits,semester) VALUES (%s,%s,%s,%s,%s,%s)",
         (data.student_id,data.subject_code,data.subject_name,data.grade,data.credits,data.semester))
     db.commit(); db.close(); return {"message":"Result added"}
 
@@ -152,8 +158,9 @@ def dashboard():
     db=get_db(); cur=db.cursor(dictionary=True)
     cur.execute("SELECT COUNT(*) as total FROM students"); ts=cur.fetchone()["total"]
     cur.execute("SELECT COUNT(*) as total FROM results"); tr=cur.fetchone()["total"]
-    cur.execute("SELECT department,COUNT(*) as count FROM students GROUP BY department"); dept=cur.fetchall()
-    db.close(); return {"total_students":ts,"total_results":tr,"by_department":dept}
+    cur.execute("SELECT department,COUNT(*) as count FROM students GROUP BY department")
+    dept=cur.fetchall(); db.close()
+    return {"total_students":ts,"total_results":tr,"by_department":dept}
 
 @app.get("/search")
 def search(q:str):
